@@ -1,0 +1,104 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using TrialDDDxTDD.DomainModel;
+
+namespace TrialTDD.DomainModel
+{
+    public class BalancesPerSubject
+    {
+        private DateTime today;
+        private List<Subject> Subjects = new List<Subject>();
+
+        //TODO:クエリメソッドなので、ドメインモデルからは削除し、クエリスタックのモデルに置くこと。
+        public int CheckBalanceTheSubjectIs(string subjectName)
+        {
+            //return BalancePerSubjects[subjectName];
+            return Subjects.Single(x => x.Name == subjectName).Balance.Value;
+        }
+
+        #region private methods
+        //private void CalcurateSubjectBalanceWhenEnteringDebit(string subjectName, uint subjectAmmount)
+        //{
+        //    int tranlatedBalanceFromAmmount = int.Parse(subjectAmmount.ToString());
+        //    if (Subjects.Any(x => x.Name == subjectName)) Subjects.Single(x => x.Name == subjectName).CalcurateBalance(tranlatedBalanceFromAmmount);
+        //    else Subjects.Add(Subject.Factory(subjectName, tranlatedBalanceFromAmmount));
+        //}
+        //private void CalcurateSubjectBalanceWhenEnteringCredit(string subjectName, uint subjectAmmount)
+        //{
+        //    int tranlatedBalanceFromAmmount = TranslateToBalanceFromCreditAmmountByEnterRuleOfBalance(subjectAmmount);
+        //    if (Subjects.Any(x => x.Name == subjectName)) Subjects.Single(x => x.Name == subjectName).CalcurateBalance(tranlatedBalanceFromAmmount);
+        //    else Subjects.Add(Subject.Factory(subjectName, tranlatedBalanceFromAmmount));
+        //}
+        private void CalcurateSubjectBalanceWhenEnteringDebits(IQueryable debits)
+        {
+            foreach (Debit debit in debits)
+            {
+                int tranlatedBalanceFromAmmount = int.Parse(debit.CheckValueOfAmmount().ToString());
+                string subjectName = debit.CheckSubjectName();
+                if (Subjects.Any(x => x.Name == subjectName)) Subjects.Single(x => x.Name == subjectName).CalcurateBalance(tranlatedBalanceFromAmmount);
+                else Subjects.Add(Subject.Factory(subjectName, tranlatedBalanceFromAmmount));
+            }
+        }
+        private void CalcurateSubjectBalanceWhenEnteringCredits(IQueryable credits)
+        {
+            foreach (Credit credit in credits)
+            {
+                int tranlatedBalanceFromAmmount = TranslateToBalanceFromCreditAmmountByEnterRuleOfBalance(credit.CheckValueOfAmmount());
+                string subjectName = credit.CheckSubjectName();
+                if (Subjects.Any(x => x.Name == subjectName)) Subjects.Single(x => x.Name == subjectName).CalcurateBalance(tranlatedBalanceFromAmmount);
+                else Subjects.Add(Subject.Factory(subjectName, tranlatedBalanceFromAmmount));
+            }
+        }
+        private int TranslateToBalanceFromCreditAmmountByEnterRuleOfBalance(uint subjectCreditAmount)
+        {
+            return -1 * int.Parse(subjectCreditAmount.ToString());
+        }
+        #endregion
+
+        private BalancesPerSubject() { }
+        public static BalancesPerSubject Factory()
+        {
+            return new BalancesPerSubject();
+        }
+        //public static BalancesPerSubject Factory(BalancesPerSubject yesterdayBalancesPerSubject, Journal todaysJournal)
+        //{
+        //    if (yesterdayBalancesPerSubject == null) throw new ArgumentNullException();
+        //    if (todaysJournal == null) throw new ArgumentException();
+        //    BalancesPerSubject balancesPerSubject = new BalancesPerSubject()
+        //    {
+        //        today = DateTime.Today,
+        //        Subjects = new List<Subject>(yesterdayBalancesPerSubject.Subjects)
+        //    };
+        //    IQueryable<Debit> debitSubjects = todaysJournal.CheckDebitSubjects();
+        //    foreach (var ds in debitSubjects)
+        //    {
+        //        balancesPerSubject.CalcurateSubjectBalanceWhenEnteringDebit(ds.CheckSubjectName(), ds.CheckValueOfAmmount());
+        //    }
+        //    IQueryable<Credit> creditSubjects = todaysJournal.CheckCreditSubjects();
+        //    foreach (var cs in creditSubjects)
+        //    {
+        //        balancesPerSubject.CalcurateSubjectBalanceWhenEnteringCredit(cs.CheckSubjectName(), cs.CheckValueOfAmmount());
+        //    }
+        //    return balancesPerSubject;
+        //}
+        public static BalancesPerSubject Factory(BalancesPerSubject yesterdayBalancesPerSubject, List<TransferSlip> transferSlips)
+        {
+            if (yesterdayBalancesPerSubject == null) throw new ArgumentNullException();
+            if (transferSlips == null) throw new ArgumentException();
+            BalancesPerSubject balancesPerSubject = new BalancesPerSubject()
+            {
+                today = DateTime.Today,
+                Subjects = new List<Subject>(yesterdayBalancesPerSubject.Subjects)
+            };
+            foreach (var ts in transferSlips)
+            {
+                balancesPerSubject.CalcurateSubjectBalanceWhenEnteringDebits(ts.CheckDebits());
+                balancesPerSubject.CalcurateSubjectBalanceWhenEnteringCredits(ts.CheckCredits());
+            }
+            return balancesPerSubject;
+        }
+    }
+}

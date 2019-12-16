@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DomainModel\BalancesPerSubject.cs" />
+    <Compile Remove="DomainModel\DebitCreditSubject.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DomainModel\BalancesPerSubject.cs.bak" />
+  </ItemGroup>
+
+</Project>
