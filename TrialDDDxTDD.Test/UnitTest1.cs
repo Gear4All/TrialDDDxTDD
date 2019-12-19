@@ -11,7 +11,7 @@ namespace TrialDDDxTDD.Test
     public class UnitTest1
     {
         [TestMethod]
-        public void U‘Ö“`•[‚ğ‹L’ ‚·‚é‚Æ‚«U‘Ö“`•[‚Ì‘İØ‚ª‹Ït‚µ‚Ä‚¢‚È‚¢‚È‚çNotBalanceBetweenDebitAndCreditException‚ğ”­¶‚³‚¹‚é()
+        public void U‘Ö“`•[‚ğ‹L’ ‚·‚é‚Æ‚«U‘Ö“`•[‚Ì‘İØ‚ª‹Ït‚µ‚Ä‚¢‚È‚¢‚È‚çNotBalancingBetweenDebitAndCreditException‚ğ”­¶‚³‚¹‚é()
         {
             DateTime occuredDate = DateTime.Today;
             Debit debit0 = Debit.Factory("Cash", 100);
@@ -25,7 +25,7 @@ namespace TrialDDDxTDD.Test
                   new List<Credit>() { credit }
                 );
             }
-            catch (NotBalanceBetweenDebitAndCreditException)
+            catch (NotBalancingBetweenDebitAndCreditException)
             {
                 Assert.IsTrue(true);
             }

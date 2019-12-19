@@ -37,7 +37,7 @@ namespace TrialDDDxTDD.DomainModel
 
         public static TransferSlip Factory(DateTime occuredDate, IEnumerable<Debit> debits, IEnumerable<Credit> credits)
         {
-            if (debits.Select(x => int.Parse(x.CheckValueOfAmmount().ToString())).Sum() != credits.Select(x => int.Parse(x.CheckValueOfAmmount().ToString())).Sum()) throw new NotBalanceBetweenDebitAndCreditException();
+            if (debits.Select(x => int.Parse(x.CheckValueOfAmmount().ToString())).Sum() != credits.Select(x => int.Parse(x.CheckValueOfAmmount().ToString())).Sum()) throw new NotBalancingBetweenDebitAndCreditException();
             return new TransferSlip(occuredDate,debits, credits);
         }
 
